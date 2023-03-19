@@ -8,6 +8,6 @@
     - [trading pairs](https://trade.blocktrade.com/api_documentation#trading-pairs)
     - [ws](https://trade.blocktrade.com/api_documentation#order-book--websockets-)
 
-##### Some code examples
+##### Some useful code examples
 - [https://github.com/trever-io/go-blocktrade](https://github.com/trever-io/go-blocktrade)
 - [https://github.com/johnwashburne/Crypto-Price-Aggregator](https://github.com/johnwashburne/Crypto-Price-Aggregator)
