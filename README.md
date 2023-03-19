@@ -1,6 +1,6 @@
 # cryptoexchange-order-book
-Inspired by https://youtu.be/OsXjDZ52dyQ video
-Code [https://github.com/forward32/quotes](https://github.com/forward32/quotes)
+#### Inspired by https://youtu.be/OsXjDZ52dyQ video
+##### Code [https://github.com/forward32/quotes](https://github.com/forward32/quotes)
 
 ##### Documentation:
 - [blocktrade.com](https://trade.blocktrade.com/api_documentation#blocktrade-api)
