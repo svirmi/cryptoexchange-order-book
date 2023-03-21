@@ -2,6 +2,8 @@ package bybit
 
 import (
 	"context"
+	"encoding/json"
+	"fmt"
 	"log"
 	"time"
 
@@ -55,16 +57,32 @@ func (s *Source) receiveData(ctx context.Context) error {
 		return err
 	}
 
-	var (
-		stop bool
-		err  error
-	)
-
 	for {
+		select {
+		case <-ctx.Done():
+			return nil
+		default: // read from WS connection
+			mt, data, err := conn.ReadMessage()
+			if err != nil {
+				return err
+			}
+			if mt != websocket.TextMessage {
+				return fmt.Errorf("wrong message type")
+			}
+			header := struct{ Type string }{}
+			if err := json.Unmarshal(data, &header); err != nil {
+				return err
+			}
 
+			switch header.Type {
+			case "snapshot":
+				s.onSnapshot(data)
+			case "update":
+				s.onUpdate(data)
+			default:
+			}
+		}
 	}
-
-	return nil
 }
 
 func (s *Source) onSnapshot(data []byte) error { return nil }

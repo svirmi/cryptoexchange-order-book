@@ -5,6 +5,7 @@
 ##### Documentation:
 - [https://www.bybit.com](https://www.bybit.com)
     - [WS](https://bybit-exchange.github.io/docs/v5/websocket/public/orderbook)
+    - [How to Subscribe to Topics](https://bybit-exchange.github.io/docs/v5/ws/connect#how-to-subscribe-to-topics)
 
 
     

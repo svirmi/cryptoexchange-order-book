@@ -1,5 +1,7 @@
 package bybit
 
+//  {"req_id":"test", "op":"subscribe", "args":["orderbook.1.BTCUSDT"]}
+
 func GetWsOrderBookSubscribeRequest() interface{} {
 	subsribeReq := struct {
 		ReqId     string
