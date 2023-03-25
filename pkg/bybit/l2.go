@@ -27,15 +27,15 @@ func NewL2OrderBook() *L2OrderBook {
 }
 
 func (ob *L2OrderBook) Apply(price decimal.Decimal, side types.SideType, volume uint64, tm time.Time) {
-	obs := ob.bid
+	obs := ob.bid // orderbook side
 	if side == types.SideAsk {
 		obs = ob.ask
 	}
 
 	item := obs.InsertOrGet(&L2OrderBookItem{Price: price})
 
-	if volume == 0 {
-		obs.Delete(item)
+	if volume == 0 { // check if volume at this price level is zero
+		obs.Delete(item) // delete this price level
 		return
 	}
 

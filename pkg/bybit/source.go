@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"order-book/pkg/types"
 	"time"
 
 	"github.com/gorilla/websocket"
@@ -18,8 +19,14 @@ const (
 	defaultWriteTimeout  = time.Second * 5
 )
 
+type Source struct {
+	l2BySymbol map[string]*L2OrderBook
+}
+
 func NewSource() *Source {
-	return &Source{}
+	return &Source{
+		l2BySymbol: make(map[string]*L2OrderBook),
+	}
 }
 
 func (s *Source) Start(ctx context.Context) {
@@ -85,6 +92,21 @@ func (s *Source) receiveData(ctx context.Context) error {
 	}
 }
 
-func (s *Source) onSnapshot(data []byte) error { return nil }
+func (s *Source) onSnapshot(data []byte) error {
+	var snapshot WsL2Snapshot
+	if err := json.Unmarshal(data, &snapshot); err != nil {
+		return err
+	}
+
+	l2 := NewL2OrderBook()
+	s.l2BySymbol[snapshot.Params.Symbol] = l2
+
+	for _, item := range snapshot.Payload.Snapshot {
+		side := types.SideFromString(item.Side)
+		tm := time.Unix(0, item.Timestamp)
+		l2.Apply(item.Price, side, item.Volume, tm)
+	}
+	return nil
+}
 
 func (s *Source) onUpdate(data []byte) error { return nil }
