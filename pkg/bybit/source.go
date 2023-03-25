@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"order-book/pkg/types"
+	"sync"
 	"time"
 
 	"github.com/gorilla/websocket"
@@ -20,6 +21,7 @@ const (
 )
 
 type Source struct {
+	sync.RWMutex
 	l2BySymbol map[string]*L2OrderBook
 }
 
@@ -98,14 +100,26 @@ func (s *Source) onSnapshot(data []byte) error {
 		return err
 	}
 
+	s.Lock()
+	defer s.Unlock()
+
 	l2 := NewL2OrderBook()
 	s.l2BySymbol[snapshot.Params.Symbol] = l2
 
-	for _, item := range snapshot.Payload.Snapshot {
-		side := types.SideFromString(item.Side)
-		tm := time.Unix(0, item.Timestamp)
-		l2.Apply(item.Price, side, item.Volume, tm)
+	for _, items := range [][]*WsL2Item{
+		snapshot.Payload.Snapshot,
+		snapshot.Payload.Updates,
+	} {
+		for _, item := range items {
+			side := types.SideFromString(item.Side)
+			tm := time.Unix(0, item.Timestamp)
+			l2.Apply(item.Price, side, item.Volume, tm)
+		}
 	}
+
+	log.Printf("snapshot applied: symbol=%s, bid=%d, ask=%d",
+		snapshot.Params.Symbol, l2.bid.Len(), l2.ask.Len())
+
 	return nil
 }
 
