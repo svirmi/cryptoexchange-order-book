@@ -123,4 +123,27 @@ func (s *Source) onSnapshot(data []byte) error {
 	return nil
 }
 
-func (s *Source) onUpdate(data []byte) error { return nil }
+func (s *Source) onUpdate(data []byte) error {
+	var update WsL2Update
+	if err := json.Unmarshal(data, &update); err != nil {
+		return err
+	}
+
+	s.Lock()
+	defer s.Unlock()
+
+	l2, ok := s.l2BySymbol[update.Params.Symbol]
+	if !ok {
+		log.Printf("inconsistent update for symbol %s", update.Params.Symbol)
+		return nil
+	}
+
+	side := types.SideFromString(update.Payload.Side)
+	tm := time.Unix(0, update.Payload.Timestamp)
+	l2.Apply(update.Payload.Price, side, update.Payload.Volume, tm)
+
+	log.Printf("update applied: symbol=%s, bid=%d, ask=%d",
+		update.Params.Symbol, l2.bid.Len(), l2.ask.Len())
+
+	return nil
+}
