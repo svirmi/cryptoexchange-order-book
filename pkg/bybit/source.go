@@ -32,6 +32,7 @@ func NewSource() *Source {
 }
 
 func (s *Source) Start(ctx context.Context) {
+	fmt.Println("started...")
 
 	for {
 		select {
@@ -41,7 +42,7 @@ func (s *Source) Start(ctx context.Context) {
 
 		default:
 			if err := s.receiveData(ctx); err != nil {
-				log.Printf("error recieveing data: %v", err)
+				log.Printf("error recieving data: %v", err)
 			}
 
 			// TODO : refactor retry connection code
@@ -66,6 +67,8 @@ func (s *Source) receiveData(ctx context.Context) error {
 		return err
 	}
 
+	fmt.Printf("connected to websocket %s\n", bybitWsUrl)
+
 	for {
 		select {
 		case <-ctx.Done():
@@ -78,10 +81,16 @@ func (s *Source) receiveData(ctx context.Context) error {
 			if mt != websocket.TextMessage {
 				return fmt.Errorf("wrong message type")
 			}
-			header := struct{ Type string }{}
+
+			header := struct {
+				Type    string
+				Success bool
+			}{}
 			if err := json.Unmarshal(data, &header); err != nil {
 				return err
 			}
+
+			fmt.Printf("recieved header type %s\n", header.Type)
 
 			switch header.Type {
 			case "snapshot":
