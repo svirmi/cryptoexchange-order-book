@@ -147,3 +147,18 @@ func (s *Source) onUpdate(data []byte) error {
 
 	return nil
 }
+
+func (s *Source) GetL2OrderBook(symbol string, size int) (types.L2OrderBook, error) {
+	s.RLock()
+	defer s.RUnlock()
+
+	l2, ok := s.l2BySymbol[symbol]
+	if !ok {
+		return types.L2OrderBook{}, fmt.Errorf("no data for symbol %s", symbol)
+	}
+
+	return types.L2OrderBook{
+		Bid: l2.GetBid(size),
+		Ask: l2.GetAsk(size),
+	}, nil
+}

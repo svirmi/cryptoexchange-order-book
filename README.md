@@ -22,3 +22,9 @@
 
 ##### Reading list:
 - [CCXT Crypto Exchange Order Book (Python)](https://blog.shrimpy.io/blog/ccxt-crypto-exchange-order-book-snapshot)
+
+##### To run test
+```bash
+/cryptoexchange-order-book/pkg/bybit$ go test -v -race
+```
+
